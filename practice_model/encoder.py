@@ -57,7 +57,7 @@ class Transformer_encoder(nn.Module):
         x = x.long()
         
         embeddings =self.embedding(x)
-        
+        # print(embeddings.shape)
         x = embeddings + self.pos(embeddings)
         
       
