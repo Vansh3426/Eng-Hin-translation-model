@@ -14,10 +14,10 @@ path ="practice_model/dataset/Dataset_English_Hindi.csv"
 df = pd.read_csv(path)
 
 text_full=(df["English"].astype(str)).tolist()
-text =text_full[:1500]
+text =text_full[:10000]
 
 target_full=(df['Hindi'].astype(str)).tolist()
-target=target_full[:2000]
+target=target_full[:10000]
 
 
 
@@ -77,8 +77,9 @@ def text_to_index(list_sentences,vocab):
         sentence_to_index =[]
         tokenize_sentence_to_index.append(sentence_to_index)
         for token in sentence:
-            token = vocab[token]
-            sentence_to_index.append(token)
+            if token in vocab:
+                token = vocab[token]
+                sentence_to_index.append(token)
 
     return tokenize_sentence_to_index
 
@@ -96,10 +97,10 @@ def size(text):
 
 eng_max_length = size(eng_tokenized_sentence)
 # eng_max_length = 25
-print(eng_max_length)
+# print(eng_max_length)
 hin_max_length = size(hin_tokenized_sentence)
 # hin_max_length = 25
-print(hin_max_length)
+# print(hin_max_length)
 
 
 
