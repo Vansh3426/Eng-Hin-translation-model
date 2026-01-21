@@ -98,20 +98,20 @@ class Transformer_runner(nn.Module):
         super().__init__()
         
         
-        self.encoder = Transformer_encoder(vocab_size=eng_vocab_size , head_num=enc_head_num , embed_dim = encoder_embed_dim ,ff_dim=encoder_ff_dim ,max_length=eng_max_length )
-        self.decoder = Transformer_decoder(vocab_size=hin_vocab_size , head_num=dec_head_num , embed_dim = decoder_embed_dim ,ff_dim=decoder_ff_dim ,max_length=hin_max_length)
+        self.encoder = Transformer_encoder(vocab_size=eng_vocab_size , head_num=enc_head_num , embed_dim = encoder_embed_dim ,ff_dim=encoder_ff_dim ,max_length=500 )
+        self.decoder = Transformer_decoder(vocab_size=hin_vocab_size , head_num=dec_head_num , embed_dim = decoder_embed_dim ,ff_dim=decoder_ff_dim ,max_length=500)
         self.linear =nn.Linear(decoder_embed_dim , hin_vocab_size)
         
         
-    def forward(self , x  , y ):
+    def forward(self , x , y ):
        
         encoder_output = self.encoder( x )
         decoder_output  = self.decoder( y , encoder_output)   
         
         pred= self.linear(decoder_output)
         
-        output = torch.softmax(pred , dim= -1)
-        
+        # output = torch.softmax(pred , dim= -1)
+        output =pred
        
         return output  
 
@@ -127,12 +127,25 @@ model = Transformer_runner(eng_vocab_size =eng_vocab_size , enc_head_num = 8 ,en
 
 
 
+model_args = {
+    "eng_vocab_size": eng_vocab_size,
+    "enc_head_num": 8,
+    "encoder_embed_dim": 128,
+    "encoder_ff_dim": 512,
+    "eng_max_length": 15,
+
+    "hin_vocab_size": hin_vocab_size,
+    "dec_head_num": 8,
+    "decoder_embed_dim": 128,
+    "decoder_ff_dim": 512,
+    "hin_max_length": 20
+}
 
 
 
 
 loss_fn = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
-optimizer = torch.optim.Adam(params=model.parameters() ,lr = 0.001)
+optimizer = torch.optim.Adam(params=model.parameters() ,lr = 0.0006)
 
 
 
@@ -141,7 +154,7 @@ if __name__ == "__main__":
     
     model.train()
 
-    epochs =10
+    epochs =20
 
     for epoch in range(epochs):
         
@@ -172,6 +185,8 @@ if __name__ == "__main__":
             optimizer.step()
             
         print(f' Epochs   :    {epoch}         loss :  {total_loss/total_batch} ')
+        
+        torch.save(model.state_dict() ,'practice_model/model_01.pth')
             
             
             
