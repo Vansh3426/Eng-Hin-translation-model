@@ -24,6 +24,7 @@ class Multi_head_attention(nn.Module):
         
     def forward(self,x ,pad_mask= None):
         
+        # print(x.shape)
         B ,T ,E = x.shape
         
         Q = self.q(x)
