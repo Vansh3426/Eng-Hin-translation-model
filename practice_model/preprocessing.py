@@ -14,29 +14,60 @@ path ="practice_model/dataset/Dataset_English_Hindi.csv"
 df = pd.read_csv(path)
 
 text_full=(df["English"].astype(str)).tolist()
-text =text_full[:10000]
+text =text_full[:5000]
 
 target_full=(df['Hindi'].astype(str)).tolist()
-target=target_full[:10000]
+target=target_full[:5000]
 
 
 
-path1 ='practice_model/vocab/eng_vocab1.json'
+path1 ='practice_model/vocab/eng_vocab2.json'
 
 with open(path1, 'r', encoding='utf-8') as f:
     eng_vocab = json.load(f)
 
-path2 ='practice_model/vocab/hin_vocab1.json'
+path2 ='practice_model/vocab/hin_vocab2.json'
 
 with open(path2, 'r', encoding='utf-8') as f:
     hin_vocab = json.load(f)
     
     
+
+
+# eng_vocab ={ '<pad>':0, '<unk>':1, '<sos>':2, '<eos>':3}
+# hin_vocab ={ '<pad>':0, '<unk>':1, '<sos>':2, '<eos>':3}
+
+# def dictionary(list,vocab,nlp):
+    
+#     for sent in list:
+#         doc = nlp(sent)
+#         for token in doc:
+#             if not token.is_punct and not token.is_quote and not token.is_space:
+#                     token =token.text.lower()
+#                     if token not in vocab:
+#                         vocab[token] = len(vocab)
+                    
+#     return vocab
+
+# eng_vocab = dictionary(text,eng_vocab ,nlp_en)
+# hin_vocab = dictionary(target,hin_vocab,nlp_hi)
+
+
 eng_vocab_size =len(eng_vocab)
 hin_vocab_size =len(hin_vocab)
 
 print(eng_vocab_size)
 print(hin_vocab_size)
+
+
+# with open('eng_vocab2.json', 'w', encoding='utf-8') as f:
+#     json.dump(eng_vocab, f, ensure_ascii=False, indent=4)
+
+# # Save hin_vocab
+# with open('hin_vocab2.json', 'w', encoding='utf-8') as f:
+#     json.dump(hin_vocab, f, ensure_ascii=False, indent=4)
+
+# print("Vocabularies saved successfully!")
 
 def tokenize(text_list,nlp):
     tokenized_sent =[]
@@ -143,7 +174,7 @@ class MyDataset(Dataset):
     
 my_dataset = MyDataset(english_sequences ,hindi_sequences)
 
-dataloader =DataLoader(dataset= my_dataset,batch_size=32,shuffle=True)
+dataloader =DataLoader(dataset= my_dataset,batch_size=64,shuffle=True)
 
 # x ,y = next(iter(dataloader))
 
