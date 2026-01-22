@@ -13,7 +13,7 @@ torch.manual_seed(32)
 torch.cuda.manual_seed(42)
 
 
-PAD_IDX = 0
+
 
 class Decoder_layer(nn.Module):
     def __init__(self , embed_dim , head_num , ff_dim , dropout = 0.1):
@@ -54,7 +54,8 @@ class Transformer_decoder(nn.Module):
     def __init__(self , vocab_size , head_num ,embed_dim ,ff_dim ,max_length ):
         
         super().__init__()
-        
+        PAD_IDX =0
+        self.embed_dim = embed_dim
         self.embedding =nn.Embedding(vocab_size , embed_dim , padding_idx=PAD_IDX)
         self.pos = PositionalEncoding(max_length ,embed_dim)
         self.decoder =Decoder_layer(embed_dim ,head_num,ff_dim)
@@ -74,6 +75,7 @@ class Transformer_decoder(nn.Module):
         pad_mask = pad_mask.unsqueeze(1).unsqueeze(2)
         
         embedding = self.embedding(decoder_training)
+        embedding = embedding * math.sqrt(self.embed_dim)
         embed_y = embedding + self.pos(embedding) 
         
         
@@ -110,8 +112,9 @@ class Transformer_runner(nn.Module):
         
         pred= self.linear(decoder_output)
         
-        # output = torch.softmax(pred , dim= -1)
-        output =pred
+        # print(pred.shape)
+        output = torch.softmax(pred , dim= -1)
+        # output =pred
        
         return output  
 
@@ -119,33 +122,33 @@ class Transformer_runner(nn.Module):
 
 
 model = Transformer_runner(eng_vocab_size =eng_vocab_size , enc_head_num = 8 ,encoder_embed_dim =128 ,
-                           encoder_ff_dim =512 ,eng_max_length =15,
+                           encoder_ff_dim =264 ,eng_max_length =50,
                            
                            hin_vocab_size =hin_vocab_size ,dec_head_num =8 , decoder_embed_dim  = 128,
-                           decoder_ff_dim = 512, hin_max_length= 20).to(device)
+                           decoder_ff_dim = 264, hin_max_length = 50).to(device)
 
 
 
 
-model_args = {
-    "eng_vocab_size": eng_vocab_size,
-    "enc_head_num": 8,
-    "encoder_embed_dim": 128,
-    "encoder_ff_dim": 512,
-    "eng_max_length": 15,
+# model_args = {
+#     "eng_vocab_size": eng_vocab_size,
+#     "enc_head_num": 8,
+#     "encoder_embed_dim": 128,
+#     "encoder_ff_dim": 512,
+#     "eng_max_length": 15,
 
-    "hin_vocab_size": hin_vocab_size,
-    "dec_head_num": 8,
-    "decoder_embed_dim": 128,
-    "decoder_ff_dim": 512,
-    "hin_max_length": 20
-}
+#     "hin_vocab_size": hin_vocab_size,
+#     "dec_head_num": 8,
+#     "decoder_embed_dim": 128,
+#     "decoder_ff_dim": 512,
+#     "hin_max_length": 20
+# }
 
 
-
+PAD_IDX = 0
 
 loss_fn = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
-optimizer = torch.optim.Adam(params=model.parameters() ,lr = 0.0006)
+optimizer = torch.optim.Adam(params=model.parameters() ,lr = 0.001)
 
 
 
@@ -176,7 +179,17 @@ if __name__ == "__main__":
             optimizer.zero_grad()
             
             loss = loss_fn(pred ,decoder_loss)
+            # print(loss)
             total_loss += loss
+            
+            
+            print(f' Batch_elemnents  :    {batch}    loss : {loss} ')
+            
+            # if not torch.isfinite(loss):
+            #     print("Loss exploded")
+            #     print("max logit:", pred.max().item())
+            #     print("min logit:", pred.min().item())
+            #     break
             
             total_batch += 1
             
@@ -186,7 +199,7 @@ if __name__ == "__main__":
             
         print(f' Epochs   :    {epoch}         loss :  {total_loss/total_batch} ')
         
-        torch.save(model.state_dict() ,'practice_model/model_01.pth')
+        torch.save(model.state_dict() ,'practice_model/model_04.pth')
             
             
             

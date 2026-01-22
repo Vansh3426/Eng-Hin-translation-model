@@ -52,7 +52,7 @@ class Multi_head_attention(nn.Module):
              # [B, 1, 1, T]
             
             # print(pad_mask_expanded.shape)
-            scores = scores.masked_fill(pad_mask, float('-inf'))
+            scores = scores.masked_fill(pad_mask, -1e9)
             # print(f' scores after padmask  : {scores.shape}')
         # print(f'scores after scaling  :  {scores}')
         
@@ -261,7 +261,7 @@ class Masked_multi_head_attention(nn.Module):
             combined_mask = causal_mask
 
    
-        scores = scores.masked_fill(~combined_mask, float('-inf'))
+        scores = scores.masked_fill(~combined_mask, -1e9)
 
         # print(f'scores after scaling  :  {scores}')
         

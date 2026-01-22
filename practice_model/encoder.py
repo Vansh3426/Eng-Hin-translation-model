@@ -3,6 +3,7 @@ import torch
 from torch import nn 
 from helping_blocks import Multi_head_attention , Layer_norm , PositionalEncoding , Feed_forward
 from preprocessing import english_sequences , eng_vocab_size ,eng_max_length
+import math
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -57,6 +58,7 @@ class Transformer_encoder(nn.Module):
         x = x.long()
         
         embeddings =self.embedding(x)
+        embeddings = embeddings * math.sqrt(self.embed_dim)
         # print(embeddings.shape)
         x = embeddings + self.pos(embeddings)
         
