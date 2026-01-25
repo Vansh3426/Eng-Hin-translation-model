@@ -14,19 +14,19 @@ path ="practice_model/dataset/Dataset_English_Hindi.csv"
 df = pd.read_csv(path)
 
 text_full=(df["English"].astype(str)).tolist()
-text =text_full[:5000]
+text =text_full[:10000]
 
 target_full=(df['Hindi'].astype(str)).tolist()
-target=target_full[:5000]
+target=target_full[:10000]
 
 
 
-path1 ='practice_model/vocab/eng_vocab2.json'
+path1 ='practice_model/vocab/eng_vocab3.json'
 
 with open(path1, 'r', encoding='utf-8') as f:
     eng_vocab = json.load(f)
 
-path2 ='practice_model/vocab/hin_vocab2.json'
+path2 ='practice_model/vocab/hin_vocab3.json'
 
 with open(path2, 'r', encoding='utf-8') as f:
     hin_vocab = json.load(f)
@@ -60,11 +60,11 @@ print(eng_vocab_size)
 print(hin_vocab_size)
 
 
-# with open('eng_vocab2.json', 'w', encoding='utf-8') as f:
+# with open('practice_model/vocab/eng_vocab3.json', 'w', encoding='utf-8') as f:
 #     json.dump(eng_vocab, f, ensure_ascii=False, indent=4)
 
 # # Save hin_vocab
-# with open('hin_vocab2.json', 'w', encoding='utf-8') as f:
+# with open('practice_model/vocab/hin_vocab3.json', 'w', encoding='utf-8') as f:
 #     json.dump(hin_vocab, f, ensure_ascii=False, indent=4)
 
 # print("Vocabularies saved successfully!")
@@ -174,7 +174,7 @@ class MyDataset(Dataset):
     
 my_dataset = MyDataset(english_sequences ,hindi_sequences)
 
-dataloader =DataLoader(dataset= my_dataset,batch_size=64,shuffle=True)
+dataloader =DataLoader(dataset= my_dataset,batch_size=128,shuffle=True)
 
 # x ,y = next(iter(dataloader))
 
