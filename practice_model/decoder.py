@@ -113,19 +113,19 @@ class Transformer_runner(nn.Module):
         pred= self.linear(decoder_output)
         
         # print(pred.shape)
-        output = torch.softmax(pred , dim= -1)
+        # output = torch.softmax(pred , dim= -1)
         # output =pred
        
-        return output  
+        return pred
 
 
 
 
 model = Transformer_runner(eng_vocab_size =eng_vocab_size , enc_head_num = 8 ,encoder_embed_dim =128 ,
-                           encoder_ff_dim =264 ,eng_max_length =50,
+                           encoder_ff_dim =512 ,eng_max_length =50,
                            
                            hin_vocab_size =hin_vocab_size ,dec_head_num =8 , decoder_embed_dim  = 128,
-                           decoder_ff_dim = 264, hin_max_length = 50).to(device)
+                           decoder_ff_dim = 512, hin_max_length = 50).to(device)
 
 
 
@@ -148,7 +148,7 @@ model = Transformer_runner(eng_vocab_size =eng_vocab_size , enc_head_num = 8 ,en
 PAD_IDX = 0
 
 loss_fn = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
-optimizer = torch.optim.Adam(params=model.parameters() ,lr = 0.001)
+optimizer = torch.optim.Adam(params=model.parameters() ,lr = 0.0003)
 
 
 
@@ -157,7 +157,7 @@ if __name__ == "__main__":
     
     model.train()
 
-    epochs =20
+    epochs =30
 
     for epoch in range(epochs):
         
