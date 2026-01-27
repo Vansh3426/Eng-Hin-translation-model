@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import math
 from helping_blocks import Masked_multi_head_attention ,Multi_head_attention ,PositionalEncoding , Layer_norm ,Feed_forward ,Cross_attention
-from preprocessing import hindi_sequences ,hin_vocab_size ,eng_vocab_size ,english_sequences ,eng_max_length ,hin_max_length ,dataloader
+from preprocessing_02 import vocab_size ,max_length ,dataloader
 from encoder import Transformer_encoder
 
 
@@ -51,10 +51,10 @@ class Decoder_layer(nn.Module):
    
 class Transformer_decoder(nn.Module):
     
-    def __init__(self , vocab_size , head_num ,embed_dim ,ff_dim ,max_length ):
+    def __init__(self , vocab_size , head_num ,embed_dim ,ff_dim ,max_length ,):
         
         super().__init__()
-        PAD_IDX =0
+        PAD_IDX = -1
         self.embed_dim = embed_dim
         self.embedding =nn.Embedding(vocab_size , embed_dim , padding_idx=PAD_IDX)
         self.pos = PositionalEncoding(max_length ,embed_dim)
@@ -70,7 +70,7 @@ class Transformer_decoder(nn.Module):
         
         
         
-        PAD_IDX = 0
+        PAD_IDX = -1
         pad_mask = (decoder_training == PAD_IDX)
         pad_mask = pad_mask.unsqueeze(1).unsqueeze(2)
         
@@ -95,14 +95,14 @@ class Transformer_decoder(nn.Module):
         
 class Transformer_runner(nn.Module):
     
-    def __init__(self , eng_vocab_size , enc_head_num ,encoder_embed_dim ,encoder_ff_dim ,eng_max_length ,hin_vocab_size ,dec_head_num , decoder_embed_dim ,decoder_ff_dim , hin_max_length ):
+    def __init__(self , vocab_size , enc_head_num ,encoder_embed_dim ,encoder_ff_dim  ,dec_head_num , decoder_embed_dim ,decoder_ff_dim ,max_length ):
         
         super().__init__()
         
         
-        self.encoder = Transformer_encoder(vocab_size=eng_vocab_size , head_num=enc_head_num , embed_dim = encoder_embed_dim ,ff_dim=encoder_ff_dim ,max_length=500 )
-        self.decoder = Transformer_decoder(vocab_size=hin_vocab_size , head_num=dec_head_num , embed_dim = decoder_embed_dim ,ff_dim=decoder_ff_dim ,max_length=500)
-        self.linear =nn.Linear(decoder_embed_dim , hin_vocab_size)
+        self.encoder = Transformer_encoder(vocab_size , head_num=enc_head_num , embed_dim = encoder_embed_dim ,ff_dim=encoder_ff_dim ,max_length =max_length )
+        self.decoder = Transformer_decoder(vocab_size , head_num=dec_head_num , embed_dim = decoder_embed_dim ,ff_dim=decoder_ff_dim ,max_length =max_length)
+        self.linear =nn.Linear(decoder_embed_dim , vocab_size)
         
         
     def forward(self , x , y ):
@@ -121,11 +121,9 @@ class Transformer_runner(nn.Module):
 
 
 
-model = Transformer_runner(eng_vocab_size =eng_vocab_size , enc_head_num = 8 ,encoder_embed_dim =128 ,
-                           encoder_ff_dim =512 ,eng_max_length =50,
-                           
-                           hin_vocab_size =hin_vocab_size ,dec_head_num =8 , decoder_embed_dim  = 128,
-                           decoder_ff_dim = 512, hin_max_length = 50).to(device)
+model = Transformer_runner(vocab_size , enc_head_num = 4 ,encoder_embed_dim =128 ,
+                           encoder_ff_dim =256 ,max_length = max_length ,dec_head_num =4 , decoder_embed_dim  = 128,
+                           decoder_ff_dim = 256).to(device)
 
 
 
@@ -145,7 +143,7 @@ model = Transformer_runner(eng_vocab_size =eng_vocab_size , enc_head_num = 8 ,en
 # }
 
 
-PAD_IDX = 0
+PAD_IDX = -1
 
 loss_fn = nn.CrossEntropyLoss(ignore_index=PAD_IDX)
 optimizer = torch.optim.Adam(params=model.parameters() ,lr = 0.0003)
@@ -164,10 +162,10 @@ if __name__ == "__main__":
         total_loss = 0
         total_batch = 0
 
-        for batch ,(X , y) in enumerate(dataloader):
+        for batch in (dataloader):
         
-            X ,y = X.to(device) ,y.to(device)
-
+            X ,y = batch['input_ids'].to(device) ,batch['target_ids'].to(device)
+         
             decoder_input = y[: , :-1]
             decoder_loss = y[: , 1:]
             
@@ -183,7 +181,7 @@ if __name__ == "__main__":
             total_loss += loss
             
             
-            print(f' Batch_elemnents  :    {batch}    loss : {loss} ')
+            # print(f' Batch_elemnents  :    {batch}    loss : {loss} ')
             
             # if not torch.isfinite(loss):
             #     print("Loss exploded")
@@ -199,7 +197,7 @@ if __name__ == "__main__":
             
         print(f' Epochs   :    {epoch}         loss :  {total_loss/total_batch} ')
         
-        torch.save(model.state_dict() ,'practice_model/model_04.pth')
+        torch.save(model.state_dict() ,'practice_model/100k_model_06.pth')
             
             
             
