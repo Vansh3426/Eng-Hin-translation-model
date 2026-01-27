@@ -1,5 +1,5 @@
 import torch 
-from preprocessing import tokenize , text_to_index  ,nlp_en ,padding
+from preprocessing_02 import tokenize , text_to_index  ,nlp_en ,padding
 from decoder import Transformer_runner 
 import json
 
@@ -40,7 +40,7 @@ def prediction(text ,model):
     
     tokenize_text = tokenize(text,nlp_en)
     
-    max_length =50
+    max_length =64
     indexed_sent =text_to_index(tokenize_text,eng_vocab)
     
     # pad_len = max_length - len(indexed_sent)
