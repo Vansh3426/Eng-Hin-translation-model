@@ -1,0 +1,6 @@
+__pycache__
+vocab
+__init__.py 
+dataset
+*.pth
+
